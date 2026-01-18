@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Spin & Toss</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --accent: #38bdf8;
+    --bg: #020617;
+    --card-bg: #1e293b;
+    --success: #22c55e;
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: white;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* Navigation Tabs */
+  .tabs {
+    display: flex;
+    width: 100%;
+    background: #0f172a;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #334155;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: none;
+    color: #94a3b8;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.3s;
+  }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
+    background: rgba(56, 189, 248, 0.05);
+  }
+
+  .content-section {
+    display: none;
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .content-section.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Shared UI Elements */
+  .card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: white;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  /* Toss Specific UI */
+  .coin-container {
+    perspective: 1000px;
+    margin: 40px auto;
+    width: 150px;
+    height: 150px;
+  }
+
+  .coin {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .coin div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 5px solid #fbbf24;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+  }
+
+  .coin .tails {
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, #64748b, #475569);
+    border-color: #94a3b8;
+  }
+
+  /* Team Spin Wheel UI */
+  .arena {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+  }
+
+  .wheel {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+  }
+
+  .spinning { animation: shake 0.15s infinite; }
+  @keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .result-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+  }
+
+  .result-list li {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--success);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="openTab('team-tab', this)">👥 Team Spin</button>
+  <button class="tab-btn" onclick="openTab('toss-tab', this)">🪙 Toss</button>
+</div>
+
+<section id="team-tab" class="content-section active">
+  <div class="card">
+    <input id="capIn" placeholder="Enter Captain Name">
+    <button class="btn-primary" onclick="add('cap')">Add Captain</button>
+    <div id="capList" style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Captains: None</div>
+  </div>
+
+  <div class="card">
+    <input id="partIn" placeholder="Enter Partner Name">
+    <button class="btn-primary" onclick="add('part')">Add Partner</button>
+    <div id="partList" style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Partners: None</div>
+  </div>
+
+  <div class="arena">
+    <div style="text-align:center">
+      <div class="wheel" id="wCap">?</div>
+      <small>CAPTAIN</small>
+    </div>
+    <div style="color: #475569; font-weight: bold;">VS</div>
+    <div style="text-align:center">
+      <div class="wheel" id="wPart">?</div>
+      <small>PARTNER</small>
+    </div>
+  </div>
+
+  <button class="btn-primary" style="padding: 18px; border-radius: 50px; font-size: 1.1rem; background: linear-gradient(to right, #2563eb, #7c3aed);" onclick="spinTeam()">🎡 SPIN DRAW</button>
+
+  <h3 style="margin-top: 30px;">Matched Pairs</h3>
+  <ul id="resList" class="result-list"></ul>
+</section>
+
+<section id="toss-tab" class="content-section">
+  <div class="card" style="text-align: center;">
+    <h2>Coin Toss</h2>
+    <div class="coin-container">
+      <div class="coin" id="coin">
+        <div class="heads">HEADS</div>
+        <div class="tails">TAILS</div>
+      </div>
+    </div>
+    <h3 id="tossResult" style="color: var(--accent); min-height: 1.5em;">Ready?</h3>
+    <button class="btn-primary" style="padding: 18px; border-radius: 50px;" onclick="tossCoin()">🪙 FLIP COIN</button>
+  </div>
+</section>
+
+<script>
+// Tab Logic
+function openTab(tabId, btn) {
+  document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Team Spin Logic
+let captains = [];
+let partners = [];
+
+function add(type) {
+  const input = document.getElementById(type === 'cap' ? 'capIn' : 'partIn');
+  const val = input.value.trim();
+  if(val) {
+    if(type === 'cap') captains.push(val);
+    else partners.push(val);
+    input.value = "";
+    updateLabels();
+  }
+}
+
+function updateLabels() {
+  document.getElementById('capList').textContent = "Captains: " + (captains.join(", ") || "None");
+  document.getElementById('partList').textContent = "Partners: " + (partners.join(", ") || "None");
+}
+
+function spinTeam() {
+  if(!captains.length || !partners.length) return alert("Add names first!");
+  
+  const wCap = document.getElementById('wCap');
+  const wPart = document.getElementById('wPart');
+  wCap.classList.add('spinning');
+  wPart.classList.add('spinning');
+
+  let count = 0;
+  const timer = setInterval(() => {
+    wCap.textContent = captains[Math.floor(Math.random()*captains.length)];
+    wPart.textContent = partners[Math.floor(Math.random()*partners.length)];
+    count++;
+    if(count > 20) {
+      clearInterval(timer);
+      const cIdx = Math.floor(Math.random()*captains.length);
+      const pIdx = Math.floor(Math.random()*partners.length);
+      const c = captains.splice(cIdx, 1)[0];
+      const p = partners.splice(pIdx, 1)[0];
+      
+      wCap.textContent = c;
+      wPart.textContent = p;
+      wCap.classList.remove('spinning');
+      wPart.classList.remove('spinning');
+      
+      const li = document.createElement('li');
+      li.textContent = `🤝 ${c} — ${p}`;
+      document.getElementById('resList').prepend(li);
+      updateLabels();
+    }
+  }, 100);
+}
+
+// Toss Logic
+let currentRotation = 0;
+function tossCoin() {
+  const coin = document.getElementById('coin');
+  const resultText = document.getElementById('tossResult');
+  
+  resultText.textContent = "Spinning...";
+  const isHeads = Math.random() < 0.5;
+  
+  // Add 5-10 extra full rotations for effect
+  const extraRotation = Math.floor(Math.random() * 5) + 5; 
+  currentRotation += extraRotation * 180 + (isHeads ? 0 : 180);
+  
+  // Ensure we always land flat on one side
+  if ((currentRotation / 180) % 2 !== 0 && isHeads) currentRotation += 180;
+  if ((currentRotation / 180) % 2 === 0 && !isHeads) currentRotation += 180;
+
+  coin.style.transform = `rotateY(${currentRotation}deg)`;
+
+  setTimeout(() => {
+    resultText.textContent = isHeads ? "RESULT: HEADS" : "RESULT: TAILS";
+  }, 2000);
+}
+</script>
+
+</body>
+</html>
