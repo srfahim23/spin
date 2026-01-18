@@ -24,7 +24,6 @@
     min-height: 100vh;
   }
 
-  /* Navigation Tabs */
   .tabs {
     display: flex;
     width: 100%;
@@ -71,7 +70,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Shared UI Elements */
   .card {
     background: var(--card-bg);
     padding: 20px;
@@ -100,9 +98,83 @@
     color: white;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s;
   }
 
-  /* Toss Specific UI */
+  .btn-primary:active { transform: scale(0.98); }
+
+  .arena {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0;
+  }
+
+  .wheel {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .spinning { 
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+    transform: scale(1.1);
+    animation: pulse 0.15s infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { transform: scale(1.1); }
+    to { transform: scale(1.12); }
+  }
+
+  .winner-flash {
+    animation: winnerPop 0.5s ease-out forwards;
+  }
+
+  @keyframes winnerPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.3); color: var(--success); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .result-list {
+    list-style: none;
+    padding: 0;
+    text-align: center; /* সেন্টারে থাকলে হ্যান্ডশেক আইকনসহ ভালো দেখায় */
+  }
+
+  .result-list li {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--success);
+    animation: slideIn 0.3s ease;
+    font-size: 1.1rem;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Toss UI */
   .coin-container {
     perspective: 1000px;
     margin: 40px auto;
@@ -116,9 +188,6 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .coin div {
@@ -134,7 +203,6 @@
     font-weight: bold;
     border: 5px solid #fbbf24;
     background: linear-gradient(135deg, #f59e0b, #d97706);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
   }
 
   .coin .tails {
@@ -142,54 +210,6 @@
     background: linear-gradient(135deg, #64748b, #475569);
     border-color: #94a3b8;
   }
-
-  /* Team Spin Wheel UI */
-  .arena {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px 0;
-  }
-
-  .wheel {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    border: 4px solid var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #0f172a;
-    font-size: 0.9rem;
-    font-weight: bold;
-    text-align: center;
-    padding: 5px;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-  }
-
-  .spinning { animation: shake 0.15s infinite; }
-  @keyframes shake {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(5deg); }
-    75% { transform: rotate(-5deg); }
-    100% { transform: rotate(0deg); }
-  }
-
-  .result-list {
-    list-style: none;
-    padding: 0;
-    text-align: left;
-  }
-
-  .result-list li {
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--success);
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border-left: 4px solid var(--success);
-  }
-
 </style>
 </head>
 <body>
@@ -215,18 +235,18 @@
   <div class="arena">
     <div style="text-align:center">
       <div class="wheel" id="wCap">?</div>
-      <small>CAPTAIN</small>
+      <small style="color: #94a3b8; margin-top: 8px; display: block; font-weight: bold;">CAPTAIN</small>
     </div>
-    <div style="color: #475569; font-weight: bold;">VS</div>
+    <div style="color: #475569; font-weight: 900; font-size: 1.2rem;">VS</div>
     <div style="text-align:center">
       <div class="wheel" id="wPart">?</div>
-      <small>PARTNER</small>
+      <small style="color: #94a3b8; margin-top: 8px; display: block; font-weight: bold;">PARTNER</small>
     </div>
   </div>
 
-  <button class="btn-primary" style="padding: 18px; border-radius: 50px; font-size: 1.1rem; background: linear-gradient(to right, #2563eb, #7c3aed);" onclick="spinTeam()">🎡 SPIN DRAW</button>
+  <button class="btn-primary" style="padding: 18px; border-radius: 50px; font-size: 1.1rem; background: linear-gradient(to right, #2563eb, #7c3aed); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);" onclick="spinTeam()">🎡 SPIN DRAW</button>
 
-  <h3 style="margin-top: 30px;">Matched Pairs</h3>
+  <h3 style="margin-top: 30px; text-align: center;">Matched Pairs</h3>
   <ul id="resList" class="result-list"></ul>
 </section>
 
@@ -245,7 +265,6 @@
 </section>
 
 <script>
-// Tab Logic
 function openTab(tabId, btn) {
   document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -253,7 +272,6 @@ function openTab(tabId, btn) {
   btn.classList.add('active');
 }
 
-// Team Spin Logic
 let captains = [];
 let partners = [];
 
@@ -278,16 +296,24 @@ function spinTeam() {
   
   const wCap = document.getElementById('wCap');
   const wPart = document.getElementById('wPart');
+  
+  wCap.classList.remove('winner-flash');
+  wPart.classList.remove('winner-flash');
   wCap.classList.add('spinning');
   wPart.classList.add('spinning');
 
   let count = 0;
-  const timer = setInterval(() => {
+  const animate = () => {
     wCap.textContent = captains[Math.floor(Math.random()*captains.length)];
     wPart.textContent = partners[Math.floor(Math.random()*partners.length)];
     count++;
-    if(count > 20) {
-      clearInterval(timer);
+    
+    if(count < 25) {
+      setTimeout(animate, 60);
+    } else {
+      wCap.classList.remove('spinning');
+      wPart.classList.remove('spinning');
+      
       const cIdx = Math.floor(Math.random()*captains.length);
       const pIdx = Math.floor(Math.random()*partners.length);
       const c = captains.splice(cIdx, 1)[0];
@@ -295,36 +321,32 @@ function spinTeam() {
       
       wCap.textContent = c;
       wPart.textContent = p;
-      wCap.classList.remove('spinning');
-      wPart.classList.remove('spinning');
+      wCap.classList.add('winner-flash');
+      wPart.classList.add('winner-flash');
       
-      const li = document.createElement('li');
-      li.textContent = `🤝 ${c} — ${p}`;
-      document.getElementById('resList').prepend(li);
-      updateLabels();
+      setTimeout(() => {
+        const li = document.createElement('li');
+        // Updated here: Removed "matched with" and put 🤝 in middle
+        li.innerHTML = `<strong>${c}</strong> 🤝 <strong>${p}</strong>`;
+        document.getElementById('resList').prepend(li);
+        updateLabels();
+      }, 500);
     }
-  }, 100);
+  };
+  animate();
 }
 
-// Toss Logic
 let currentRotation = 0;
 function tossCoin() {
   const coin = document.getElementById('coin');
   const resultText = document.getElementById('tossResult');
-  
   resultText.textContent = "Spinning...";
   const isHeads = Math.random() < 0.5;
-  
-  // Add 5-10 extra full rotations for effect
-  const extraRotation = Math.floor(Math.random() * 5) + 5; 
+  const extraRotation = Math.floor(Math.random() * 5) + 8; 
   currentRotation += extraRotation * 180 + (isHeads ? 0 : 180);
-  
-  // Ensure we always land flat on one side
   if ((currentRotation / 180) % 2 !== 0 && isHeads) currentRotation += 180;
   if ((currentRotation / 180) % 2 === 0 && !isHeads) currentRotation += 180;
-
   coin.style.transform = `rotateY(${currentRotation}deg)`;
-
   setTimeout(() => {
     resultText.textContent = isHeads ? "RESULT: HEADS" : "RESULT: TAILS";
   }, 2000);
